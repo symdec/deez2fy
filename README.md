@@ -58,13 +58,13 @@ Where `<ID>` is the client ID and `<SECRET>` the client secret you retrieved.
 **Case 1 : Using uv**  
 Run `uv run main.py -i <DEEZER_PLAYLIST_ID> -n <PLAYLIST_NAME_ON_SPOTIFY>`  
 
-Ex : `uv run main.py -i 1306085715 -n "Ma Playlist"`
+Ex : `uv run main.py -i 1306085715 -n "My Playlist"`
 
 **Case 2 : Using pip**
 
 Run `python main.py -i <DEEZER_PLAYLIST_ID> -n <PLAYLIST_NAME_ON_SPOTIFY>`
 
-Ex : `python main.py -i 1306085715 -n "Ma Playlist"`
+Ex : `python main.py -i 1306085715 -n "My Playlist"`
 
 
 > More help on usage can be seen using the option `--help` / `-h`
