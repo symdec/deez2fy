@@ -40,13 +40,13 @@ Once your Python environment is ready, to migrate a Deezer playlist to Spotify :
 
 3. Create / Connect to your Spotify dev account, going here https://developer.spotify.com/dashboard 
 
-4. Create a project (named "Deezer migration" for example)
+4. In your Spotify dev dashboard, create a project (named "Deezer migration" for example)
 
 5. Set the redirect URI to the value `http://127.0.0.1:8080`
 
 6. In your Spotify project, retrieve your **Client ID** and **Client Secret**.
 
-7. In the root of this project, create a `.env` file containing your Spotify API credentials, like below :
+7. Back to this git project, on the root, create a `.env` file containing your Spotify API credentials, like below :
 ```
 SPOTIFY_CLIENT_ID=<ID>
 SPOTIFY_CLIENT_SECRET=<SECRET>
@@ -65,3 +65,6 @@ Ex : `uv run main.py -i 1306085715 -n "Ma Playlist"`
 Run `python main.py -i <DEEZER_PLAYLIST_ID> -n <PLAYLIST_NAME_ON_SPOTIFY>`
 
 Ex : `python main.py -i 1306085715 -n "Ma Playlist"`
+
+
+> More help on usage can be seen using the option `--help` / `-h`
