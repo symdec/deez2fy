@@ -8,8 +8,10 @@ This project allows to migrate your Deezer playlists to Spotify.
 This project was built using *uv* as Python dependencies manager, which is fast and precisely tracks the dependencies.  
 You can install uv very quickly here : https://docs.astral.sh/uv/getting-started/installation/.
 
-
-TODO
+Run this command to install the dependencies in your uv project environment :
+```
+$ uv sync
+```
 
 ### Using pip
 If so, it is recommended to use a virtual environment to install the dependencies.  
@@ -17,7 +19,7 @@ If so, it is recommended to use a virtual environment to install the dependencie
 Pip-install the dependencies listed in `pyproject.toml`.  
 Ex :   
 ```
-pip install \
+$ pip install \
     deezer-python \
     google \
     loguru \
@@ -30,18 +32,36 @@ Exact info on versions can be found in the `pyproject.toml`.
 
 ## Getting started
 
-Once your Python environment is ready,
+Once your Python environment is ready, to migrate a Deezer playlist to Spotify :
 
-TODO playlist must be public
-TODO details on spotify API
-TODO redirect URI info
+1. Make the Deezer playlist public
 
-In the root of this project, create a `.env` file containing your Spotify API credentials, like below :
+2. Go to your playlist in the web and retrieve its ID in the URL (e.g.: `1306085715`)
+
+3. Create / Connect to your Spotify dev account, going here https://developer.spotify.com/dashboard 
+
+4. Create a project (named "Deezer migration" for example)
+
+5. Set the redirect URI to the value `http://127.0.0.1:8080`
+
+6. In your Spotify project, retrieve your **Client ID** and **Client Secret**.
+
+7. In the root of this project, create a `.env` file containing your Spotify API credentials, like below :
 ```
 SPOTIFY_CLIENT_ID=<ID>
 SPOTIFY_CLIENT_SECRET=<SECRET>
 ```
-Where `<ID>` is your Spotify API app ID and `<SECRET>` your Spotify API app secret.
+Where `<ID>` is the client ID and `<SECRET>` the client secret you retrieved.
 
+8. Run the main file :  
 
-TODO usage
+**Case 1 : Using uv**  
+Run `uv run main.py -i <DEEZER_PLAYLIST_ID> -n <PLAYLIST_NAME_ON_SPOTIFY>`  
+
+Ex : `uv run main.py -i 1306085715 -n "Ma Playlist"`
+
+**Case 2 : Using pip**
+
+Run `python main.py -i <DEEZER_PLAYLIST_ID> -n <PLAYLIST_NAME_ON_SPOTIFY>`
+
+Ex : `python main.py -i 1306085715 -n "Ma Playlist"`
