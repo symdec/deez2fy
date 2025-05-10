@@ -1,11 +1,13 @@
 from time import sleep
 import spotify_utils as spo
 import deezer_utils as deez
-from utils import fetch_json_from_url, progress_print
+from utils import fetch_json_from_url, progress_print, retry_on_429
 import argparse
 from dotenv import load_dotenv
 import os
 from loguru import logger
+
+SLEEP_TIME = 5 # time to wait between requests (to minimize the risk of exceeding the rate limit)
 
 
 def main():
@@ -42,20 +44,21 @@ def main():
     print(f'Converting playlist "{playlist_name}" with {nb_songs} songs from Deezer to Spotify...')
     for idx, (song, artist) in enumerate(titles_and_artists):
         try:
-            song_link = spo.find(artist=artist, song_name=song)
+            song_link = retry_on_429(lambda: spo.find(artist=artist, song_name=song))
             playlist_id = spo.check_playlist(spoti_client, playlist_name)
             if spo.check_song(artist, song, song_link, spoti_client):
-                spoti_client.playlist_add_items(playlist_id, [song_link])
+                # try to add the song to the playlist, in case of rate limit, retry
+                retry_on_429(lambda: spoti_client.playlist_add_items(playlist_id, [song_link]))
                 progress_print(idx, nb_songs, song, artist, is_ok=True)
             else:
-                raise ValueError("Artist or title mismatch while retrieving song")
+                raise ValueError("Artist or title mismatch between Deezer and Spotify")
 
         except Exception as e:
             logger.debug(f"Error while converting {song} by {artist} : {e}")
             progress_print(idx, nb_songs, song, artist, is_ok=False)
 
         finally:
-            sleep(1)  # rate limit
+            sleep(SLEEP_TIME)
 
 
 if __name__ == "__main__":

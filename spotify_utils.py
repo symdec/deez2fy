@@ -1,8 +1,10 @@
+from time import sleep
 from spotipy import SpotifyOAuth, Spotify
 from googlesearch import search
 from typing import Dict, List
 
 REDIRECT_URI = "http://127.0.0.1:8080"
+SLEEP_TIME = 5
 
 class FindError(Exception):
     """Exception raised when a Spotify link / object has not been found."""
@@ -36,25 +38,16 @@ def find(artist: str, song_name: str) -> str:
     FindError: If the Spotify link was not found.
     """
     query = f"spotify.com/track/ {artist} {song_name}"
-    final = None
-
-    try:
-        for url in search(query, stop=3):
-            if "spotify.com/track" in url:
-                final = url
-                break
-            elif "spotify.link" in url:  # if no direct link was found
-                # perform additional search to find direct link
-                for sub_url in search(url, stop=1):
-                    if "spotify.com/track" in sub_url:
-                        final = sub_url
-                        break
-        if final is None:
-            raise FindError("Spotify link not found")
-    except Exception as e:
-        raise FindError(f"Error during the Spotify link research : {str(e)}")
-
-    return final
+    for url in search(query, stop=3):
+        if "spotify.com/track" in url:
+            return url
+        elif "spotify.link" in url:  # if no direct link was found
+            sleep(SLEEP_TIME) # wait to avoid rate limit
+            # perform additional search to find direct link
+            for sub_url in search(url, stop=1):
+                if "spotify.com/track" in sub_url:
+                    return sub_url
+    raise FindError("Spotify link not found")
 
 
 def check_playlist(spotify: Spotify, playlist_name: str) -> str:
