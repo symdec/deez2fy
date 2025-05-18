@@ -9,8 +9,6 @@ import os
 from loguru import logger
 
 SLEEP_TIME = 2  # time to wait between requests (to minimize the risk of exceeding the rate limit)
-DEEZER_PLAYLIST_URI = "https://api.deezer.com/playlist/"
-
 
 def main():
     args = parse_args()
