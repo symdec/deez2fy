@@ -2,7 +2,7 @@ import sys
 from time import sleep
 import deez2fy.spotify_utils as spo
 import deez2fy.deezer_utils as deez
-from deez2fy.utils import fetch_json_from_url, progress_print
+from deez2fy.utils import progress_print
 import argparse
 from dotenv import load_dotenv
 import os
@@ -36,7 +36,7 @@ def main():
     # retrieve song-artist tuples from Deezer playlist
     songs_and_artists = deez.get_songs_artists(deezer_playlist_id)
     nb_songs = len(songs_and_artists)
-    
+
     # convert playlist
     print(
         f'Converting playlist "{playlist_name}" with {nb_songs} songs from Deezer to Spotify...'
