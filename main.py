@@ -22,8 +22,8 @@ def main():
     else:
         logger.add(sys.stderr, level="INFO")
 
-    deezer_playlist_uri = DEEZER_PLAYLIST_URI + args.id
-    playlist_name = args.name
+    deezer_playlist_id = args.playlist_id
+    playlist_name = args.playlist_name
 
     # Spotify authentication
     load_dotenv()
@@ -33,16 +33,15 @@ def main():
     spoti_id = spoti_client.me()["id"]
     spoti_client.user_playlist_create(spoti_id, playlist_name)
 
-    # retrieve deezer playlist data
-    json_data = fetch_json_from_url(deezer_playlist_uri)
-    titles_and_artists = deez.extract_songs_artists(json_data)
-    nb_songs = len(titles_and_artists)
-
+    # retrieve song-artist tuples from Deezer playlist
+    songs_and_artists = deez.get_songs_artists(deezer_playlist_id)
+    nb_songs = len(songs_and_artists)
+    
     # convert playlist
     print(
         f'Converting playlist "{playlist_name}" with {nb_songs} songs from Deezer to Spotify...'
     )
-    for idx, (song, artist) in enumerate(titles_and_artists):
+    for idx, (song, artist) in enumerate(songs_and_artists):
         try:
             track_id = spo.search_track(spoti_client, artist=artist, song_name=song)
             playlist_id = spo.get_playlist_id(spoti_client, playlist_name)
@@ -53,11 +52,11 @@ def main():
                 raise ValueError("Artist or title mismatch between Deezer and Spotify")
 
         except Exception as e:
-            progress_print(idx, nb_songs, song, artist, is_ok=False)
             logger.debug(f"Error while converting {song} by {artist} : {e}")
+            progress_print(idx, nb_songs, song, artist, is_ok=False)
 
         finally:
-            sleep(SLEEP_TIME) # sleep time to avoid exceeding the rate limit
+            sleep(SLEEP_TIME)  # sleep time to avoid exceeding the rate limit
 
 
 def parse_args():
@@ -68,11 +67,18 @@ def parse_args():
     parser.add_argument(
         "-i",
         "--id",
-        help="Deezer playlist ID (found in the URL when you open your playlist)",
+        dest="playlist_id",
+        type=str,
+        help="Deezer playlist ID (found in the URL of your playlist page)",
         required=True,
     )
     parser.add_argument(
-        "-n", "--name", help="Name of the playlist to create on Spotify", required=True
+        "-n",
+        "--name",
+        dest="playlist_name",
+        type=str,
+        help="Name of the playlist to create on Spotify",
+        required=True,
     )
     parser.add_argument(
         "-d",
