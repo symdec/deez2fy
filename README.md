@@ -68,3 +68,8 @@ Ex : `python main.py -i 1306085715 -n "My Playlist"`
 
 
 > More help on usage can be seen using the option `--help` / `-h`
+
+## Known issues (for future improvements)
+
+- If the Deezer playlist has more than 400 tracks, only the first 400 will be migrated
+- Some tracks that exist on Spotify are not migrated properly (not found during the search) 

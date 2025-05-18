@@ -6,7 +6,6 @@ readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "deezer-python>=7.1.1",
-    "google>=3.0.0",
     "loguru>=0.7.3",
     "python-dotenv>=1.1.0",
     "spotipy>=2.25.1",
