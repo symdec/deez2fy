@@ -21,7 +21,6 @@ Ex :
 ```
 $ pip install \
     deezer-python \
-    google \
     loguru \
     python-dotenv \
     spotipy
