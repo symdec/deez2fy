@@ -26,24 +26,35 @@ def authenticate(client_id: str, client_secret: str) -> Spotify:
 
 
 @retry_on_429
-def search_track(spotify: Spotify, artist: str, song_name: str) -> str:
+def search_track(spotify: Spotify, artist: str, song_name: str) -> List[str]:
     """Search a Spotify track by artist and song name
 
     :param spotify: a Spotify client instance used for interacting with Spotify's API.
     :param artist: the artist name
     :param song_name: the song name
-    :return: the first result of the search
+    :return: the ids of the three first (at most) results of the search
     """
     result = spotify.search(
-        q=f"artist:{artist} track:{song_name}", limit=1, type="track"
+        q=f"artist:{artist} track:{song_name}", limit=3, type="track"
     )
-    track_id = result["tracks"]["items"][0]["id"]
-    name = result["tracks"]["items"][0]["name"]
-    artists = result["tracks"]["items"][0]["artists"]
-    logger.debug(
-        f'Found track: {name} by {", ".join([artist["name"] for artist in artists])}'
-    )
-    return track_id
+    nb_results = len(result["tracks"]["items"])
+    track_id_candidates = [
+        result["tracks"]["items"][idx]["id"] for idx in range(nb_results)
+    ]
+    name_candidates = [
+        result["tracks"]["items"][idx]["name"] for idx in range(nb_results)
+    ]
+    artists_candidates = [
+        result["tracks"]["items"][idx]["artists"] for idx in range(nb_results)
+    ]
+    if len(track_id_candidates) == 0:
+        logger.debug("No track candidates found")
+    else:
+        message = "Found track candidates :\n"
+        for i in range(len(track_id_candidates)):
+            message += f"  #{i+1}: [{name_candidates[i]}] by [{', '.join([artist['name'] for artist in artists_candidates[i]])}]\n"
+        logger.debug(message)
+    return track_id_candidates
 
 
 @retry_on_429
@@ -74,8 +85,33 @@ def check_song(artist: str, song: str, track_id: str, spotify: Spotify) -> bool:
     :return: True if the artist and song match, False otherwise.
     """
     track = spotify.track(track_id, market="US")
-    artists = extract_artists(track["artists"])
-    return track["name"].lower() == song.lower() and artist.lower() in artists
+    track_artists = extract_artists(track["artists"])
+    return (
+        format_song_name(track["name"]) == format_song_name(song)
+        and artist.lower() in track_artists
+    )
+
+
+def format_song_name(song_name: str) -> str:
+    """Formats a song name for comparison with Spotify track names.
+
+    Remove characters that can lead to mismatch (ex: parentheses, hyphens), remove multiple spaces, convert to lowercase
+
+    :param song_name: The song name to format.
+    :return: The formatted song name.
+    """
+    formatted_name = (
+        song_name.replace("(", "")
+        .replace(")", "")
+        .replace("[", "")
+        .replace("]", "")
+        .replace(":", "")
+        .replace("-", "")
+        .lower()
+    )
+    # replace multiple spaces with one space
+    formatted_name = " ".join(formatted_name.split())
+    return formatted_name
 
 
 def extract_artists(artist_dicts: List[Dict]) -> List[str]:
